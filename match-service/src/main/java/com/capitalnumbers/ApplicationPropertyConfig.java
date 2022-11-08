@@ -1,3 +1,4 @@
+/*
 package com.capitalnumbers;
 
 import org.springframework.context.annotation.Bean;
@@ -13,4 +14,4 @@ public class ApplicationPropertyConfig {
     static PropertySourcesPlaceholderConfigurer placeHolderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
     }
-}
+}*/
