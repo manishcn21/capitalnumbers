@@ -1,5 +1,6 @@
 package com.capitalnumbers.service;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,14 +9,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.capitalnumbers.ApplicationSQLWrapper;
+import com.capitalnumbers.SQLWrapper;
 import com.capitalnumbers.CustomException;
+import com.capitalnumbers.SQLScripts;
 import com.capitalnumbers.entity.Match;
 import com.capitalnumbers.entity.Team;
 
@@ -24,13 +27,14 @@ import com.capitalnumbers.entity.Team;
 public class MatchService {
 
 	@Autowired
-	ApplicationSQLWrapper sqlWrapper;
+	SQLWrapper sqlWrapper;
 	
 	@Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 	
-	public List<Team> getAllTeams() {
-		List<Team> teams = namedParameterJdbcTemplate.query(sqlWrapper.selectAllTeams, 
+	public List<Team> getAllTeams() throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.selectAllTeams);		
+		List<Team> teams = namedParameterJdbcTemplate.query(script, 
 				(rs, rowNum) ->
 			        new Team(
 			                rs.getLong("team_id"),
@@ -41,10 +45,11 @@ public class MatchService {
 		return teams;
 	}
 	
-	public List<Match> getAllUpcomingMatchesByTeam(Integer team_id) {
+	public List<Match> getAllUpcomingMatchesByTeam(Integer team_id) throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.upcomingMatchesByTeam);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("team_id", team_id);
-		List<Match> upcomingMatches = namedParameterJdbcTemplate.query(sqlWrapper.upcomingMatchesByTeam,
+		List<Match> upcomingMatches = namedParameterJdbcTemplate.query(script,
 				paramSource,
 				(rs, rowNum) ->
 			        new Match(
@@ -57,10 +62,11 @@ public class MatchService {
 		return upcomingMatches;
 	}
 	
-	public List<Match> getAllMatchesByTeam(Integer team_id) {
+	public List<Match> getAllMatchesByTeam(Integer team_id) throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.allMatchesByTeam);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("team_id", team_id);
-		List<Match> upcomingMatches = namedParameterJdbcTemplate.query(sqlWrapper.allMatchesByTeam,
+		List<Match> upcomingMatches = namedParameterJdbcTemplate.query(script,
 				paramSource,
 				(rs, rowNum) ->
 			        new Match(
@@ -75,9 +81,10 @@ public class MatchService {
 		return upcomingMatches;
 	}
 	
-	public List<String> getAllWinners() {
+	public List<String> getAllWinners() throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.allWinners);
 		List<String> winners = new ArrayList<String>();
-		namedParameterJdbcTemplate.query(sqlWrapper.allWinners, 
+		namedParameterJdbcTemplate.query(script, 
 				(rs, rowNum) ->
 		winners.add(rs.getString("team_name"))
         );
@@ -86,7 +93,8 @@ public class MatchService {
 	}
 	
 	public int updateMatchTime(Match match) throws CustomException {
-		Timestamp timestamp;
+		String script = sqlWrapper.getScript(SQLScripts.updateMatchTime);
+		Timestamp timestamp;		
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("match_id", match.getId());
 		try {
@@ -99,24 +107,27 @@ public class MatchService {
 		}
 		
 		paramSource.addValue("match_time", timestamp);
-		return namedParameterJdbcTemplate.update(sqlWrapper.updateMatchTime, paramSource);
+		return namedParameterJdbcTemplate.update(script, paramSource);
 	}
 	
-	public int updateTeamName(Team team) {
+	public int updateTeamName(Team team) throws CustomException{
+		String script = sqlWrapper.getScript(SQLScripts.updateTeamName);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("team_id", team.getId());
 		paramSource.addValue("team_name", team.getName());
-		return namedParameterJdbcTemplate.update(sqlWrapper.updateTeamName, paramSource);
+		return namedParameterJdbcTemplate.update(script, paramSource);
 	}
 	
-	public int deleteUpcomingMatch(int match_id) {
+	public int deleteUpcomingMatch(int match_id) throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.deleteUpcomingMatch);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("match_id", match_id);
-		return namedParameterJdbcTemplate.update(sqlWrapper.deleteUpcomingMatch, paramSource);
+		return namedParameterJdbcTemplate.update(script, paramSource);
 	}
 	
 	@Transactional(rollbackFor = Exception.class)
 	public int createUpcomingMatch(Match match) throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.createUpcomingMatch);
 		Timestamp timestamp;
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 	    try {
@@ -158,13 +169,14 @@ public class MatchService {
 		paramSource.addValue("match_start_time", timestamp);
 		paramSource.addValue("home_team_id", homeTeam.getId());
 		paramSource.addValue("away_team_id", awayTeam.getId());
-		return namedParameterJdbcTemplate.update(sqlWrapper.createUpcomingMatch, paramSource);
+		return namedParameterJdbcTemplate.update(script, paramSource);
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
-	public void addTeam(String team_name) {
+	public void addTeam(String team_name)  throws CustomException {
+		String script = sqlWrapper.getScript(SQLScripts.createTeam);
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();
 		paramSource.addValue("team_name", team_name);
-		namedParameterJdbcTemplate.update(sqlWrapper.createTeam, paramSource);
+		namedParameterJdbcTemplate.update(script, paramSource);
 	}
 }

@@ -14,11 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capitalnumbers.CustomException;
-import com.capitalnumbers.Views;
 import com.capitalnumbers.entity.Match;
 import com.capitalnumbers.entity.Team;
 import com.capitalnumbers.service.MatchService;
-import com.fasterxml.jackson.annotation.JsonView;
 
 @RestController
 @RequestMapping("/matches")
@@ -28,23 +26,56 @@ public class MatchController {
 	private MatchService matchService;
 	
 	@GetMapping("/teams")
-	public List<Team> getAllTeams() {
-		return matchService.getAllTeams();
+	public ResponseEntity<List<Team>> getAllTeams() {
+		HttpStatus status = HttpStatus.OK;
+		List<Team> teams = null;
+		try {
+			teams = matchService.getAllTeams();
+		} catch (CustomException e) {
+			status = HttpStatus.NOT_FOUND;
+		}
+		
+		return new ResponseEntity<>(teams, status);
 	}
 	
 	@GetMapping("/upcomingMatchesByTeam/{team_id}")
-	public List<Match> getUpcomingMatches(@PathVariable("team_id") Integer team_id) {
-		return matchService.getAllUpcomingMatchesByTeam(team_id);
+	public ResponseEntity<List<Match>> getUpcomingMatches(@PathVariable("team_id") Integer team_id) {
+		HttpStatus status = HttpStatus.OK;
+		List<Match> upcomingMatches = null;
+		try {
+			upcomingMatches = matchService.getAllUpcomingMatchesByTeam(team_id);
+		} catch (CustomException e) {
+			status = HttpStatus.NOT_FOUND;
+		}
+		
+		return new ResponseEntity<>(upcomingMatches, status);
 	}
 	
 	@GetMapping("/allMatchesByTeam/{team_id}")
-	public List<Match> getAllMatchesByTeam(@PathVariable("team_id") Integer team_id) {
-		return matchService.getAllMatchesByTeam(team_id);
+	public ResponseEntity<List<Match>> getAllMatchesByTeam(@PathVariable("team_id") Integer team_id) {
+		HttpStatus status = HttpStatus.OK;
+		List<Match> allMatches = null;
+		try {
+			allMatches = matchService.getAllMatchesByTeam(team_id);
+		} catch (CustomException e) {
+			status = HttpStatus.NOT_FOUND;
+		}
+		
+		return new ResponseEntity<>(allMatches, status);
 	}
 	
 	@GetMapping("/winners")
-	public List<String> getAllWinners() {
-		return matchService.getAllWinners();
+	public ResponseEntity<List<String>> getAllWinners() {
+		HttpStatus status = HttpStatus.OK;
+		List<String> allWinners = null;
+		
+		try {
+			allWinners = matchService.getAllWinners();
+		} catch (CustomException e) {
+			status = HttpStatus.NOT_FOUND;
+		}
+		
+		return new ResponseEntity<>(allWinners, status);
 	}
 	
 	@PostMapping("/updateMatchTime")
