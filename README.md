@@ -11,7 +11,9 @@ This repository contains following projects -
 	
 	3. API Gateway
 	
-Open API being used for documentation
+Open API being used for documentation - Available at http://localhost:9001/swagger-ui/index.html
+
+http://localhost:9001/api-docs
     
 Service names are being resolved using Service Registry.
 
