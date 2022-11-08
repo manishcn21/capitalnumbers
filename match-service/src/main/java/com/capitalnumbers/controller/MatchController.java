@@ -18,14 +18,28 @@ import com.capitalnumbers.entity.Match;
 import com.capitalnumbers.entity.Team;
 import com.capitalnumbers.service.MatchService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/matches")
+@Tag(name = "match", description = "the match API")
 public class MatchController {
 
 	@Autowired
 	private MatchService matchService;
 	
-	@GetMapping("/teams")
+	@Operation(summary = "Get all playing teams", description = "This method returns all teams", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Team.class)))) })	
+	@GetMapping(value = "/teams", produces = { "application/json"})
 	public ResponseEntity<List<Team>> getAllTeams() {
 		HttpStatus status = HttpStatus.OK;
 		List<Team> teams = null;
@@ -38,8 +52,14 @@ public class MatchController {
 		return new ResponseEntity<>(teams, status);
 	}
 	
-	@GetMapping("/upcomingMatchesByTeam/{team_id}")
-	public ResponseEntity<List<Match>> getUpcomingMatches(@PathVariable("team_id") Integer team_id) {
+	@Operation(summary = "Get all upcoming matches", description = "This method returns all upcoming matches for a team", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Match.class)))) })	
+	@GetMapping(value = "/upcomingMatchesByTeam/{team_id}", produces = { "application/json"})
+	public ResponseEntity<List<Match>> getUpcomingMatches(
+			@Parameter(description="Team id for which upcoming matches to return") 
+			@PathVariable("team_id") Integer team_id) {
 		HttpStatus status = HttpStatus.OK;
 		List<Match> upcomingMatches = null;
 		try {
@@ -51,8 +71,14 @@ public class MatchController {
 		return new ResponseEntity<>(upcomingMatches, status);
 	}
 	
-	@GetMapping("/allMatchesByTeam/{team_id}")
-	public ResponseEntity<List<Match>> getAllMatchesByTeam(@PathVariable("team_id") Integer team_id) {
+	@Operation(summary = "Get all matches", description = "This method returns all matches for a team", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Match.class)))) })	
+	@GetMapping(value = "/allMatchesByTeam/{team_id}", produces = { "application/json"})
+	public ResponseEntity<List<Match>> getAllMatchesByTeam(
+			@Parameter(description="Team id for which matches to return")
+			@PathVariable("team_id") Integer team_id) {
 		HttpStatus status = HttpStatus.OK;
 		List<Match> allMatches = null;
 		try {
@@ -64,7 +90,11 @@ public class MatchController {
 		return new ResponseEntity<>(allMatches, status);
 	}
 	
-	@GetMapping("/winners")
+	@Operation(summary = "Get winners", description = "This method returns winner list", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = String.class)))) })	
+	@GetMapping(value = "/winners", produces = { "application/json"})
 	public ResponseEntity<List<String>> getAllWinners() {
 		HttpStatus status = HttpStatus.OK;
 		List<String> allWinners = null;
@@ -78,8 +108,15 @@ public class MatchController {
 		return new ResponseEntity<>(allWinners, status);
 	}
 	
-	@PostMapping("/updateMatchTime")
-	public ResponseEntity<Integer> updateMatch(@RequestBody Match match) {
+	@Operation(summary = "Update match time", description = "This method update a match time", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Integer.class)))) })	
+	@PostMapping(value = "/updateMatchTime", produces = { "application/json"})
+	public ResponseEntity<Integer> updateMatch(
+			@Parameter(description="Match details. Cannot null or empty.", 
+            required=true, schema=@Schema(implementation = Match.class))
+			@RequestBody Match match) {
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		int updated = 0;
 		try
@@ -96,8 +133,15 @@ public class MatchController {
 		return new ResponseEntity<>(updated, status);
 	}
 	
-	@PostMapping("/updateTeamName")
-	public ResponseEntity<Integer> updateTeamName(@RequestBody Team team) {
+	@Operation(summary = "Update team name", description = "This method update a team name", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Integer.class)))) })	
+	@PostMapping(value = "/updateTeamName", produces = { "application/json"})
+	public ResponseEntity<Integer> updateTeamName(
+			@Parameter(description="Team details. Cannot null or empty.", 
+            required=true, schema=@Schema(implementation = Team.class))
+			@RequestBody Team team) {
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		int updated = 0;
 		try
@@ -114,8 +158,14 @@ public class MatchController {
 		return new ResponseEntity<>(updated, status);
 	}
 	
-	@DeleteMapping("/deleteUpcomingMatch/{match_id}")
-	public ResponseEntity<Integer> deleteUpcomingMatch(@PathVariable("match_id") Integer match_id) {
+	@Operation(summary = "Delete upcoming match", description = "This method delete a upcoming match", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Integer.class)))) })	
+	@DeleteMapping(value = "/deleteUpcomingMatch/{match_id}", produces = { "application/json"})
+	public ResponseEntity<Integer> deleteUpcomingMatch(
+			@Parameter(description="Match id that need to be deleted") 
+			@PathVariable("match_id") Integer match_id) {
 		HttpStatus status = HttpStatus.NO_CONTENT;
 		int updated = 0;
 		try
@@ -132,8 +182,15 @@ public class MatchController {
 		return new ResponseEntity<>(updated, status);
 	}
 	
-	@PostMapping("/addUpcomingMatch")
-	public ResponseEntity<Integer> createUpcomingMatch(@RequestBody Match match) {
+	@Operation(summary = "Add upcoming match", description = "This method add a upcoming match", tags = { "match" })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successful operation", 
+                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Integer.class)))) })	
+	@PostMapping(value = "/addUpcomingMatch", produces = { "application/json"})
+	public ResponseEntity<Integer> createUpcomingMatch(
+			@Parameter(description="Match details. Cannot null or empty.", 
+            required=true, schema=@Schema(implementation = Match.class))
+			@RequestBody Match match) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		int added = 0;
 		try
