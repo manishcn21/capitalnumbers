@@ -31,3 +31,5 @@ Run projects in following orders to consume the api ->
 
 api exposed through api-gateway.. api-gateway is single point for entry that internally use service-registry to resolve the actual service
 
+Create separate .sql file for each sql script into resources/db/queries folder and consumed from services
+
