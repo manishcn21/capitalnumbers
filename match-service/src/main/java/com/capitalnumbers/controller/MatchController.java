@@ -26,6 +26,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import models.AddMatchRequest;
+import models.MatchUpdateRequest;
 
 @RestController
 @RequestMapping("/matches")
@@ -115,13 +117,13 @@ public class MatchController {
 	@PostMapping(value = "/updateMatchTime", produces = { "application/json"})
 	public ResponseEntity<Integer> updateMatch(
 			@Parameter(description="Match details. Cannot null or empty.", 
-            required=true, schema=@Schema(implementation = Match.class))
-			@RequestBody Match match) {
+            required=true, schema=@Schema(implementation = MatchUpdateRequest.class))
+			@RequestBody MatchUpdateRequest matchUpdateRequest) {
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		int updated = 0;
 		try
 		{
-			updated = matchService.updateMatchTime(match);
+			updated = matchService.updateMatchTime(matchUpdateRequest);
 			if(updated > 0) {
 				status = HttpStatus.OK;
 			}
@@ -189,18 +191,16 @@ public class MatchController {
 	@PostMapping(value = "/addUpcomingMatch", produces = { "application/json"})
 	public ResponseEntity<Integer> createUpcomingMatch(
 			@Parameter(description="Match details. Cannot null or empty.", 
-            required=true, schema=@Schema(implementation = Match.class))
-			@RequestBody Match match) {
+            required=true, schema=@Schema(implementation = AddMatchRequest.class))
+			@RequestBody AddMatchRequest addMatchRequest) {
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		int added = 0;
-		try
-		{
-			added = matchService.createUpcomingMatch(match);
+		try {
+			added = matchService.createUpcomingMatch(addMatchRequest);
 			if(added > 0) {
 				status = HttpStatus.CREATED;
 			}
-		}
-		catch(Exception e) {
+		} catch (CustomException e) {
 			status = HttpStatus.BAD_REQUEST;
 		}
 		
