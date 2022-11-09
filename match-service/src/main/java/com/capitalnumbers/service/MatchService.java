@@ -21,7 +21,7 @@ import com.capitalnumbers.entity.Match;
 import com.capitalnumbers.entity.Team;
 
 import models.AddMatchRequest;
-import models.MatchUpdateRequest;
+import models.UpdateMatchRequest;
 
 
 @Service
@@ -93,7 +93,7 @@ public class MatchService {
 		return winners;
 	}
 	
-	public int updateMatchTime(MatchUpdateRequest matchUpdateRequest) throws CustomException {
+	public int updateMatchTime(UpdateMatchRequest matchUpdateRequest) throws CustomException {
 		String script = sqlWrapper.getScript(SQLScripts.updateMatchTime);
 		Timestamp timestamp;		
 		MapSqlParameterSource paramSource = new MapSqlParameterSource();

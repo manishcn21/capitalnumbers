@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MatchUpdateRequest {
+public class UpdateMatchRequest {
 	@Schema(description = "Unique identifier of the Match.", 
             example = "1")
 	private Long id;	

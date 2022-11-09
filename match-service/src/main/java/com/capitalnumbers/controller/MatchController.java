@@ -27,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import models.AddMatchRequest;
-import models.MatchUpdateRequest;
+import models.UpdateMatchRequest;
 
 @RestController
 @RequestMapping("/matches")
@@ -117,8 +117,8 @@ public class MatchController {
 	@PostMapping(value = "/updateMatchTime", produces = { "application/json"})
 	public ResponseEntity<Integer> updateMatch(
 			@Parameter(description="Match details. Cannot null or empty.", 
-            required=true, schema=@Schema(implementation = MatchUpdateRequest.class))
-			@RequestBody MatchUpdateRequest matchUpdateRequest) {
+            required=true, schema=@Schema(implementation = UpdateMatchRequest.class))
+			@RequestBody UpdateMatchRequest matchUpdateRequest) {
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		int updated = 0;
 		try
